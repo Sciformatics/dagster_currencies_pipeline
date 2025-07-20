@@ -21,6 +21,7 @@ ENGINE = create_engine(POSTGRES_PATH)
 
 @asset(
     description="The raw extract from the CoinCap Rates API."
+    
 )
 def all_currencies():
 
