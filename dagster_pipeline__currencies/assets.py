@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import create_engine
 from constants import POSTGRES_PATH  # Set your own Postgres instance connection in your constants file
 import pandas as pd
+import psycopg2
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #                       CONSTANTS
@@ -21,7 +22,7 @@ ENGINE = create_engine(POSTGRES_PATH)
 
 @asset(
     description="The raw extract from the CoinCap Rates API."
-    
+
 )
 def all_currencies():
 
