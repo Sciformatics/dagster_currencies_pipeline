@@ -21,15 +21,31 @@ ENGINE = create_engine(POSTGRES_PATH)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @asset(
-    description="The raw extract from the CoinCap Rates API."
+    description="The raw extract from the CoinLore crypto rates API."
 
 )
 def all_currencies():
 
-    response = requests.get('https://api.coincap.io/v2/rates').json()
-    response_df = pd.json_normalize(response['data'])
-    response_df['api_call_at'] = datetime.now()
-    response_df.to_sql('all_currencies', ENGINE, if_exists='append', index=False)
+    retries = 0
+    while retries < 3:
+        try:
+            response = requests.get('https://api.coinlore.net/api/tickers/?start=0&limit=100').json()
+            response_df = pd.json_normalize(response['data'])
+            print(response_df.head())
+            response_df['api_call_at'] = datetime.now(pytz.timezone("Etc/GMT"))
+            response_df.to_sql('all_currencies', ENGINE, if_exists='append', index=False)
+            print(f'{datetime.now(pytz.timezone("Etc/GMT"))}: Loaded to database successfully.')
+            retries+=3
+        except Exception as e:
+            print(f'Error: {e}')
+            retries +=1
+
+# @asset(
+#     description="Exchange rates"
+# )
+# def exchange_rates():
+
+
 
 @asset(
     deps=["all_currencies"],
