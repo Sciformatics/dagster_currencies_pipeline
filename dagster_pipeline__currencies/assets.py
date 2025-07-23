@@ -24,7 +24,7 @@ ENGINE = create_engine(POSTGRES_PATH)
     description="The raw extract from the CoinLore crypto rates API."
 
 )
-def all_currencies():
+def stg_source__crypto_rates():
 
     retries = 0
     while retries < 3:
@@ -33,23 +33,42 @@ def all_currencies():
             response_df = pd.json_normalize(response['data'])
             print(response_df.head())
             response_df['api_call_at'] = datetime.now(pytz.timezone("Etc/GMT"))
-            response_df.to_sql('all_currencies', ENGINE, if_exists='append', index=False)
+            response_df.to_sql('stg_source__crypto_rates', ENGINE, if_exists='append', index=False)
             print(f'{datetime.now(pytz.timezone("Etc/GMT"))}: Loaded to database successfully.')
             retries+=3
         except Exception as e:
             print(f'Error: {e}')
             retries +=1
 
-# @asset(
-#     description="Exchange rates"
-# )
-# def exchange_rates():
-
-
+@asset(
+    description="Exchange rates - GBP base"
+)
+def stg_source__exchange_rate_from_gbp():
+    
+    try:
+        response = requests.get('https://api.frankfurter.dev/v1/latest?base=GBP').json()
+        response_df = pd.json_normalize(response)
+        response_df.to_csv('stg_source__exchange_rate_from_gbp', ENGINE, if_exists='append', index=False)
+    except Exception as e:
+        print(f'Error: {e}')
 
 @asset(
-    deps=["all_currencies"],
-    description="A subset of the all_currencies table showing only crypto currencies"
+    description="Exchange rates - GBP base"
+)
+def stg_source__exchange_rate_from_usd():
+    
+    try:
+        response = requests.get('https://api.frankfurter.dev/v1/latest?base=USD').json()
+        response_df = pd.json_normalize(response)
+        response_df.to_csv('stg_source__exchange_rate_from_usd', ENGINE, if_exists='append', index=False)
+    except Exception as e:
+        print(f'Error: {e}')
+
+####### COMPLETE
+
+@asset(
+    deps=["stg_source__exchange_rate_from_gbp"],
+    description="convert crypto "
 )
 def crypto_currencies():
 
