@@ -64,7 +64,7 @@ def stg_source__exchange_rate_from_usd():
     except Exception as e:
         print(f'Error: {e}')
 
-####### COMPLETE ###
+####### COMPLETE ####
 
 @asset(
     deps=["stg_source__exchange_rate_from_gbp"],
