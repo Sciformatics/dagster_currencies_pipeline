@@ -65,6 +65,13 @@ def stg_source__exchange_rate_from_usd():
     except Exception as e:
         print(f'Error: {e}')
 
+# @asset(
+#         description="normalised model which combines crypto table and converts to GBP"
+# )
+# def nrm__crypto_rates_to_gbp():
+
+#     pd.
+
 ####### COMPLETE ####
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

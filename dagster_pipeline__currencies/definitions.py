@@ -1,5 +1,5 @@
 from dagster import Definitions, load_assets_from_modules, AssetSelection
-from dagster_pipeline__currencies.assets import test_for_nulls_in_currencies_df
+from dagster_pipeline__currencies.assets import test_for_nulls_in_stg_source__crypto_rates
 from dagster_pipeline__currencies import assets  # noqa: TID252
 from dagster import define_asset_job, ScheduleDefinition
 
