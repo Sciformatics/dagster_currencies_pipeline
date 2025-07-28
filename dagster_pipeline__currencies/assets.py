@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import create_engine
 from constants import POSTGRES_PATH  # Set your own Postgres instance connection in your constants file
 import pandas as pd
+import pytz
 import psycopg2
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -66,46 +67,16 @@ def stg_source__exchange_rate_from_usd():
 
 ####### COMPLETE ####
 
-@asset(
-    deps=["stg_source__exchange_rate_from_gbp"],
-    description="convert crypto "
-)
-def crypto_currencies():
-
-    query = '''
-        
-        SELECT * FROM all_currencies
-        WHERE TYPE ILIKE 'CRYPTO';
-    
-    '''
-    crypto_df = pd.read_sql(query, ENGINE)
-    crypto_df.to_sql('crypto_currencies', ENGINE, if_exists='replace', index=False)
-
-@asset(
-    deps=["all_currencies"],
-    description="A subset of the all_currencies table showing only fiat currencies"
-)
-def fiat_currencies():
-
-    query = '''
-    
-        SELECT * FROM all_currencies
-        WHERE TYPE ILIKE 'FIAT';
-    
-    '''
-    fiat_df = pd.read_sql(query, ENGINE)
-    fiat_df.to_sql('fiat_currencies', ENGINE, if_exists='replace', index=False)
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #                       ASSET TESTS
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Checks for nulls in ID column
 
-@asset_check(asset=all_currencies)
-def test_for_nulls_in_currencies_df():
+@asset_check(asset=stg_source__crypto_rates)
+def test_for_nulls_in_stg_source__crypto_rates():
     query = '''
-        SELECT * FROM all_currencies
+        SELECT * FROM stg_source__crypto_rates
         WHERE ID IS NOT NULL AND SYMBOL IS NOT NULL;'''
     check_for_nulls_df = pd.read_sql(query, ENGINE)
     number_of_nulls = check_for_nulls_df['id'].isna().sum()

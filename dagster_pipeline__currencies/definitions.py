@@ -18,7 +18,7 @@ hourly_schedule = ScheduleDefinition(
 
 defs = Definitions(
     assets=all_assets,
-    asset_checks=[test_for_nulls_in_currencies_df],
+    asset_checks=[test_for_nulls_in_stg_source__crypto_rates],
     jobs=[currency_api_refresh_job],
     schedules=[hourly_schedule]
 )
